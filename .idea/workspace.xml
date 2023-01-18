@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ad61e749-7743-4b7f-aa9b-5b7cffc36f45" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/examples/flows.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
@@ -31,13 +32,14 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "F:/xampp/htdocs/Projects/Zaeem/nodes",
+    "last_opened_file_path": "F:/xampp/htdocs/Projects/Zaeem/nodes/node-red-contrib-monster",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="F:\xampp\htdocs\Projects\Zaeem\nodes\node-red-contrib-monster" />
       <recent name="F:\xampp\htdocs\Projects\Zaeem\nodes" />
     </key>
   </component>
@@ -50,7 +52,7 @@
       <option name="presentableId" value="Default" />
       <updated>1674027100869</updated>
       <workItem from="1674027104444" duration="845000" />
-      <workItem from="1674029600432" duration="7188000" />
+      <workItem from="1674029600432" duration="7715000" />
     </task>
     <servers />
   </component>

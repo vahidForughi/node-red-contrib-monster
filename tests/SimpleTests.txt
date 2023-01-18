@@ -1,0 +1,147 @@
+[
+    {
+        "id": "2fe308bf08d87a20",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "d52d430630a7befa",
+        "type": "tab",
+        "label": "Flow 2",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "0928ea15eda14b2a",
+        "type": "monster config",
+        "name": "Monster Storage Config",
+        "endpoint": "http://r1z1s1.local:8080",
+        "region": "us-east-1",
+        "proxyRequired": false,
+        "proxy": "",
+        "projectId": "test"
+    },
+    {
+        "id": "bac64a7b5ee0518a",
+        "type": "Monster S3",
+        "z": "2fe308bf08d87a20",
+        "monster": "0928ea15eda14b2a",
+        "operation": "ListBuckets",
+        "Bucket": "",
+        "Key": "",
+        "UploadId": "",
+        "CopySource": "",
+        "Id": "",
+        "Delete": "",
+        "AccelerateConfiguration": "",
+        "AnalyticsConfiguration": "",
+        "CORSConfiguration": "",
+        "ServerSideEncryptionConfiguration": "",
+        "IntelligentTieringConfiguration": "",
+        "InventoryConfiguration": "",
+        "BucketLoggingStatus": "",
+        "MetricsConfiguration": "",
+        "NotificationConfiguration": "",
+        "OwnershipControls": "",
+        "Policy": "",
+        "ReplicationConfiguration": "",
+        "RequestPaymentConfiguration": "",
+        "Tagging": "",
+        "VersioningConfiguration": "",
+        "WebsiteConfiguration": "",
+        "PublicAccessBlockConfiguration": "",
+        "Expression": "",
+        "ExpressionType": "",
+        "InputSerialization": "",
+        "OutputSerialization": "",
+        "PartNumber": "",
+        "name": "",
+        "x": 340,
+        "y": 200,
+        "wires": [
+            [
+                "c69dd7972ca9b15f"
+            ],
+            [
+                "59cc4f97b109f825"
+            ]
+        ]
+    },
+    {
+        "id": "10ae2376b419a7ad",
+        "type": "inject",
+        "z": "2fe308bf08d87a20",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 170,
+        "y": 200,
+        "wires": [
+            [
+                "bac64a7b5ee0518a"
+            ]
+        ]
+    },
+    {
+        "id": "c69dd7972ca9b15f",
+        "type": "debug",
+        "z": "2fe308bf08d87a20",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "59cc4f97b109f825",
+        "type": "debug",
+        "z": "2fe308bf08d87a20",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "6758b4d19e55dc25",
+        "type": "comment",
+        "z": "2fe308bf08d87a20",
+        "name": "Simple Test Monster",
+        "info": "Simple Test Monster",
+        "x": 190,
+        "y": 100,
+        "wires": []
+    }
+]

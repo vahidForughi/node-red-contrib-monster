@@ -18,6 +18,7 @@ if msg.MonsterConfig is set, it will override the node configuration.  This allo
 For example
 	msg.MonsterConfig={
 		endpoint: "ENDPOINT",
+		projectId: "PROJECT ID",
 		accessKeyId: "ACCESS KEY",
 		secretAccessKey:"SECRET KEY",
 		region:"Region"
@@ -44,13 +45,4 @@ See [license] (https://github.com/vahidforughi/node-red-contrib-monster/blob/mas
 Contributions
 ----
 
-How to build nodes:
-
-- Make sure you have a working install, and can create flows with some of the existing nodes
-- Switch into the gen_scripts directory
-- Make a directory called 'build'
-- Run 'nodejs run_build.js' - this will automatically generate the entire node set for all AWS services, many which haven't been validated so aren't part of the library
-- Copy the files for the service of interest from 'build' to the parent directory
-- update package.json to reference the new js file
-- Restart node red
-- If it works please submit a pull request and let me know how extensively its been tested.
+Enjoy.

@@ -16,6 +16,7 @@ Parameters need to be specified as per the AWS API (typically LeadingUpperCase).
 
 if msg.MonsterConfig is set, it will override the node configuration.  This allows you to use the same node/flow with different accounts.
 For example
+```json
 	msg.MonsterConfig={
 		endpoint: "ENDPOINT",
 		projectId: "PROJECT ID",
@@ -23,6 +24,7 @@ For example
 		secretAccessKey:"SECRET KEY",
 		region:"Region"
 	}
+```
 
 
 

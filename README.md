@@ -40,7 +40,7 @@ The node-red-contrib-monster uses the following open source software:
 License
 -------
 
-See [license] (https://github.com/vahidforughi/node-red-contrib-monster/blob/master/LICENSE) (Apache License Version 2.0).
+See [license] (https://opengit.ir/nodered/node-red-contrib-monster/blob/main/LICENSE) (Apache License Version 2.0).
 
 Contributions
 ----

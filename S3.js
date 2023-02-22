@@ -31,20 +31,20 @@ module.exports = function(RED) {
 		this.accessKey = this.monsterConfig.accessKey;
 		this.secretKey = this.monsterConfig.secretKey;
 
-    var node = this;
+		var node = this;
 		var AWS = require("aws-sdk");
 		AWS.config.update({
-		// 	apiVersion: '2006-03-01',
-		// 	signatureVersion: 'v4'
-	    //  host: endpoint,
+			// 	apiVersion: '2006-03-01',
+			// 	signatureVersion: 'v4'
+			//  host: endpoint,
 			accessKeyId: this.projectId + ':' + this.accessKey,
 			secretAccessKey: this.secretKey,
-		//  region: this.region,
-        //  endpointDiscoveryEnabled: true,
-		// 	s3BucketEndpoint: true
-		// 	useFipsEndpoint : true,
-		// 	hostPrefixEnabled: false,
-		// 	s3UseArnRegion : false,
+			//  region: this.region,
+			//  endpointDiscoveryEnabled: true,
+			// 	s3BucketEndpoint: true
+			// 	useFipsEndpoint : true,
+			// 	hostPrefixEnabled: false,
+			// 	s3UseArnRegion : false,
 			s3ForcePathStyle: true
 		});
 
@@ -53,21 +53,21 @@ module.exports = function(RED) {
 			return;
 		}
 
-        if (this.monsterConfig.proxyRequired){
-            var proxy = require('proxy-agent');
-            AWS.config.update({
-                httpOptions: { agent: new proxy(this.monsterConfig.proxy) }
-            });
-        }
+		if (this.monsterConfig.proxyRequired){
+			var proxy = require('proxy-agent');
+			AWS.config.update({
+				httpOptions: { agent: new proxy(this.monsterConfig.proxy) }
+			});
+		}
 		var awsService = new AWS.S3( { 'region': node.region, 'endpoint': node.endpoint } );
-    // var s3 = new AWS.S3({endpoint: ep});
-    // awsService.service.endpoint.hostname == 'r1z1s1.local'
-    // awsService.service.endpoint.port == '8080'
+		// var s3 = new AWS.S3({endpoint: ep});
+		// awsService.service.endpoint.hostname == 'r1z1s1.local'
+		// awsService.service.endpoint.port == '8080'
 		node.on("input", function(msg) {
 			var aService = msg.MonsterConfig?new AWS.S3(msg.MonsterConfig) : awsService;
 			node.sendMsg = function (err, data, msg) {
 				if (err) {
-				    node.status({fill:"red",shape:"ring",text:"error"});
+					node.status({fill:"red",shape:"ring",text:"error"});
 					node.error("failed: " + err.toString(), msg);
 					node.send([null, { err: err }]);
 					return;
@@ -84,7 +84,7 @@ module.exports = function(RED) {
 				const req = service[node.operation](aService,msg,function(err,data){
 					node.sendMsg(err, data, msg);
 				});
-        		node.sendMsg(req);
+				node.sendMsg(req);
 
 			} else {
 				node.error("failed: Operation node defined - "+node.operation);
@@ -100,10 +100,10 @@ module.exports = function(RED) {
 				}
 				out[outArg]=tmpValue;
 			}
-                        //Monster API takes 'Payload' not 'payload' (see Lambda)
-                        if (arg=="Payload" && typeof tmpValue == 'undefined'){
-                                out[arg]=src["payload"];
-                        }
+			//Monster API takes 'Payload' not 'payload' (see Lambda)
+			if (arg=="Payload" && typeof tmpValue == 'undefined'){
+				out[arg]=src["payload"];
+			}
 
 		}
 

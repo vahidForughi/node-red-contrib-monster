@@ -1,0 +1,136 @@
+
+<!--
+  Copyright 2021 Daniel Thomas.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/x-red" data-template-name="Monster Swift">
+		<style scoped>
+				.hiddenAttrs {display:none;}
+				.visibleAttrs {display:block;}
+		</style>
+	<div class="form-row">
+		<label for="node-input-monster"><i class="fa fa-user"></i> Monster</label>
+		<input type="text" id="node-input-monster">
+	</div>
+	<div class="form-row">
+		<label for="node-input-operation"><i class="fa fa-wrench"></i> Operation</label>
+		<select type="text" id="node-input-operation">
+          <optgroup label="Server">
+           <option value="ServerInfo">ServerInfo</option>
+          </optgroup>
+          <optgroup label="Containers">
+           <option value="ListContainers">ListContainers</option>
+           <option value="CreateContainer">CreateContainer</option>
+           <option value="DeleteContainer">DeleteContainer</option>
+           <option value="GetContainerMeta">GetContainerMeta</option>
+           <option value="UpdateContainerMeta">UpdateContainerMeta</option>
+           <option value="HeadContainer">HeadContainer</option>
+          </optgroup>
+          <optgroup label="Objects">
+           <option value="ListObjects">ListObjects</option>
+           <option value="GetObject">GetObject</option>
+           <option value="PutObject">PutObject</option>
+           <option value="DeleteObject">DeleteObject</option>
+           <option value="GetObjectMeta">GetObjectMeta</option>
+           <option value="UpdateObjectMeta">UpdateObjectMeta</option>
+           <option value="HeadObject">HeadObject</option>
+          </optgroup>
+      
+		</select>
+	</div>
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i>Name</label>
+		<input type="text" id="node-input-name" placeholder="Name"></input>
+	</div>
+	<hr/>
+	<div id="AttrHolder">
+     <div class="form-row" id='ContainerAttr' class='hiddenAttrs'>
+         <label for="node-input-Container"><i class="fa fa-tag"></i>Container</label>
+         <input type="text" id="node-input-Container" placeholder="Container"></input>
+     </div>
+     <div class="form-row" id='KeyAttr' class='hiddenAttrs'>
+         <label for="node-input-Key"><i class="fa fa-tag"></i>Key</label>
+         <input type="text" id="node-input-Key" placeholder="Key"></input>
+     </div>
+     <div class="form-row" id='FilenameAttr' class='hiddenAttrs'>
+         <label for="node-input-Filename"><i class="fa fa-compass"></i>Filename</label>
+         <input type="text" id="node-input-Filename" placeholder="Filename"></input>
+     </div>
+	</div>
+
+ <script>
+	  var nodeOps={
+	    Info: [],
+	    ListContainers: [],
+        GetContainerMeta: ['#ContainerAttr'],
+        CreateContainer: ['#ContainerAttr'],
+        UpdateContainerMeta: ['#ContainerAttr'],
+        DeleteContainer: ['#ContainerAttr'],
+        HeadContainer: ['#ContainerAttr'],
+        ListObjects: ['#ContainerAttr'],
+        GetObject: ['#ContainerAttr','#KeyAttr','#FilenameAttr'],
+        GetObjectMeta: ['#ContainerAttr','#KeyAttr'],
+        PutObject: ['#ContainerAttr','#KeyAttr','#FilenameAttr'],
+        UpdateObjectMeta: ['#ContainerAttr','#KeyAttr'],
+        DeleteObject: ['#ContainerAttr','#KeyAttr'],
+        HeadObject: ['#ContainerAttr','#KeyAttr']
+      };
+      $('#node-input-operation').on('change',function(){
+          $('#AttrHolder').children().addClass('hiddenAttrs').removeClass('visibleAttrs');
+              if (nodeOps[this.value])
+                  $(nodeOps[this.value].join()).addClass('visibleAttrs').removeClass('hiddenAttrs');
+       });
+ </script>
+
+<script type="text/x-red" data-help-name="monster swift">
+<p>
+Monster Simple Storage Service
+</p>
+<p>
+<b>Descriptions to be added</b<
+</p>
+<p>
+NOTE: Parameters must be specified in the message, using the case specified in the Monster API documentation (normally UpperCaseLeading)..
+</p>
+
+</script>
+
+<script type="text/javascript">
+	RED.nodes.registerType('Monster Swift',{
+		category: 'Monster',
+		color:"#eb525f",
+		defaults: {
+			monster: {type:"monster config",required:true},
+			operation: { value: 'ListContainers' },
+				Container: { value: ""} ,
+				Key: { value: ""} ,
+                Filename: { value: ""} ,
+				CopySource: { value: ""} ,
+			name: { value: "" }
+		},
+		inputs:1,
+        outputs: 2,
+        outputLabels: ["data","err"],
+		icon: "monster.png",
+		align: "right",
+		label: function() {
+			return this.name || "Swift " + this.operation;
+		},
+		oneditprepare: function () {
+
+		}
+	});
+</script>
+

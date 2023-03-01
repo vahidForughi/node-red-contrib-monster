@@ -653,54 +653,54 @@ NOTE: Parameters must be specified in the message, using the case specified in t
 </script>
 
 <script type="text/javascript">
- RED.nodes.registerType('Monster S3',{
-  category: 'Monster',
-  color:"#C0DEED",
-  defaults: {
-   monster: {type:"monster config",required:true},
-   operation: { value: 'AbortMultipartUpload' },
+	RED.nodes.registerType('Monster S3',{
+		category: 'Monster',
+		color:"#C0DEED",
+		defaults: {
+			monster: {type:"monster config",required:true},
+			operation: { value: 'AbortMultipartUpload' },
+			
+				Bucket: { value: ""} ,
+				Key: { value: ""} ,
+				UploadId: { value: ""} ,
+				CopySource: { value: ""} ,
+				Id: { value: ""} ,
+				Delete: { value: ""} ,
+				AccelerateConfiguration: { value: ""} ,
+				AnalyticsConfiguration: { value: ""} ,
+				CORSConfiguration: { value: ""} ,
+				ServerSideEncryptionConfiguration: { value: ""} ,
+				IntelligentTieringConfiguration: { value: ""} ,
+				InventoryConfiguration: { value: ""} ,
+				BucketLoggingStatus: { value: ""} ,
+				MetricsConfiguration: { value: ""} ,
+				NotificationConfiguration: { value: ""} ,
+				OwnershipControls: { value: ""} ,
+				Policy: { value: ""} ,
+				ReplicationConfiguration: { value: ""} ,
+				RequestPaymentConfiguration: { value: ""} ,
+				Tagging: { value: ""} ,
+				VersioningConfiguration: { value: ""} ,
+				WebsiteConfiguration: { value: ""} ,
+				PublicAccessBlockConfiguration: { value: ""} ,
+				Expression: { value: ""} ,
+				ExpressionType: { value: ""} ,
+				InputSerialization: { value: ""} ,
+				OutputSerialization: { value: ""} ,
+				PartNumber: { value: ""} ,
+			name: { value: "" }
+		},
+		inputs:1,
+        outputs: 2,
+        outputLabels: ["data","err"],
+		icon: "monster.png",
+		align: "right",
+		label: function() {
+			return this.name || "S3 " + this.operation;
+		},
+		oneditprepare: function () {
 
-   Bucket: { value: ""} ,
-   Key: { value: ""} ,
-   UploadId: { value: ""} ,
-   CopySource: { value: ""} ,
-   Id: { value: ""} ,
-   Delete: { value: ""} ,
-   AccelerateConfiguration: { value: ""} ,
-   AnalyticsConfiguration: { value: ""} ,
-   CORSConfiguration: { value: ""} ,
-   ServerSideEncryptionConfiguration: { value: ""} ,
-   IntelligentTieringConfiguration: { value: ""} ,
-   InventoryConfiguration: { value: ""} ,
-   BucketLoggingStatus: { value: ""} ,
-   MetricsConfiguration: { value: ""} ,
-   NotificationConfiguration: { value: ""} ,
-   OwnershipControls: { value: ""} ,
-   Policy: { value: ""} ,
-   ReplicationConfiguration: { value: ""} ,
-   RequestPaymentConfiguration: { value: ""} ,
-   Tagging: { value: ""} ,
-   VersioningConfiguration: { value: ""} ,
-   WebsiteConfiguration: { value: ""} ,
-   PublicAccessBlockConfiguration: { value: ""} ,
-   Expression: { value: ""} ,
-   ExpressionType: { value: ""} ,
-   InputSerialization: { value: ""} ,
-   OutputSerialization: { value: ""} ,
-   PartNumber: { value: ""} ,
-   name: { value: "" }
-  },
-  inputs:1,
-  outputs: 2,
-  outputLabels: ["data","err"],
-  icon: "monster.png",
-  align: "right",
-  label: function() {
-   return this.name || "S3 " + this.operation;
-  },
-  oneditprepare: function () {
-
-  }
- });
+		}
+	});
 </script>
 

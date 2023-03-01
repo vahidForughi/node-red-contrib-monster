@@ -34,7 +34,7 @@
       "Monster S3": "S3.js",
       "Monster Swift": "Swift.js",
       "monster config": "config.js",
-      "Monster Test": "MonsterTest.js"
+      "Monster Upload": "MonsterUpload.js"
     }
   },
   "author": {

@@ -17,7 +17,7 @@
 module.exports = function(RED) {
 
 
-    function MonsterTest(n) {
+    function MonsterUpload(n) {
         var request = require("request");
         var bodyParser = require("body-parser");
         var multer = require("multer");
@@ -181,17 +181,20 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,n);
         if (RED.settings.httpNodeRoot !== false) {
 
-            if (!n.url) {
+
+            if (!n.urlPrefix) {
                 this.warn("monster-pipe-upload.errors.missing-path");
                 return;
             }
-            this.url = n.url;
+            this.urlPrefix = n.urlPrefix
+            this.url = this.urlPrefix;
             if (this.url[0] !== '/') {
                 this.url = '/'+this.url;
             }
+            this.url += "/:container/:object"
             this.method = "put";
             this.upload = true;
-
+            this.monsterConfig = RED.nodes.getNode(n.monster);
             var node = this;
 
             this.errorHandler = function(err,req,res,next) {
@@ -199,30 +202,69 @@ module.exports = function(RED) {
                 res.sendStatus(500);
             };
 
-            this.callback = function(req,res) {
-                // const tokenURL="http://r1z1s1:8080/auth/v1.0/"
-                const publicURL="http://r1z1s1:8080/v1/AUTH_test"
 
-                const uploadReqOpt = {
-                    url: publicURL + '/test/test.txt',
-                    method: 'PUT',
+            const config = {
+                endpoint: node.monsterConfig.endpoint,
+                projectId: node.monsterConfig.projectId,
+                accessKey: node.monsterConfig.accessKey,
+                secretKey: node.monsterConfig.secretKey,
+            }
+            const publicURL= config.endpoint+"/v1/AUTH_test"
+            let token = null;
+            let serverError = null;
+
+            function getToken(cfg) {
+                // node.status({fill:"yellow",shape:"dot",text:"authenticating"});
+                request({
+                    url: cfg.endpoint+'/auth/v1.0/',
+                    method: 'GET',
                     headers: {
-                        "Content-Type": "text/html; charset=UTF-8",
-                        "X-Auth-Token": "AUTH_tk168ffbf55bc840c7a9fe31552bb8801f"
+                        "X-Storage-User": cfg.projectId + ':' + cfg.accessKey,
+                        "X-Storage-Pass": cfg.secretKey
                     }
-                };
-                // let uploadReq = request(uploadReqOpt, res2 => {
-                //     node.send({test: "222", res2:res2});
-                // })
-                req.pipe(request(uploadReqOpt, res2 => {
-                    node.send({test: "222", res2:res2});
-                })).pipe(res)
-                node.send({test: "111", res:res});
+                }, (error, response, body) => {
+                    // node.send([null, {point: "getToken",error: error, response: response, body: body}]);
+                    if (response && response.statusCode === 200) {
+                        token = response.headers["x-auth-token"]
+                        // node.status({fill:"green",shape:"dot",text:"authenticate"});
+                    }
+                    else{
+                        serverError = error
+                        // node.status({fill:"red",shape:"dot",text:"unAuthenticate"});
+                        // setTimeout(()=>{ getToken() },5000)
+                    }
+                });
+            }
+            getToken(config)
 
+            this.callback = async function(req,res) {
                 var msgid = RED.util.generateId();
-                res._msgid = msgid;
-                node.send({_msgid:msgid,req:req,res:createResponseWrapper(node,res),payload:req.body});
-                // node.send({salam: "salaaaaaaaaaaaaaaaaaaaaam"});
+                if (!token) { await getToken(config) }
+
+                if (!token) {
+                    node.send([null, {_msgid:msgid,req:req,res: createResponseWrapper(node, res),payload:{statusCode: 401, error: serverError}}]);
+                }
+                else {
+                    const container = req.params.container
+                    const object = req.params.object
+
+                    var pipe = req.pipe(request({
+                        url: config.endpoint + "/v1/AUTH_test" + "/" + container + "/" + object,
+                        method: 'PUT',
+                        headers: {
+                            "Content-Type": "text/html; charset=UTF-8",
+                            "X-Auth-Token": token
+                        }
+                    }));
+                    pipe.on('end', () => {
+                        res._msgid = msgid;
+                        if (pipe.response && (pipe.response.statusCode === 200 || pipe.response.statusCode === 201 || pipe.response.statusCode === 203 || pipe.response.statusCode === 204)) {
+                            node.send([{_msgid: msgid,req: req,res: createResponseWrapper(node, res),payload: {...pipe.response, container: container, object: object}}, null]);
+                        }else {
+                            node.send([null, {_msgid:msgid,req:req,payload:pipe.response}]);
+                        }
+                    })
+                }
             };
 
             var httpMiddleware = function(req,res,next) { next(); }
@@ -267,16 +309,9 @@ module.exports = function(RED) {
                 };
             }
 
-            if (this.method == "get") {
-                RED.httpNode.get(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,this.callback,this.errorHandler);
-            } else if (this.method == "post") {
-                RED.httpNode.post(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,multipartParser,rawBodyParser,this.callback,this.errorHandler);
-            } else if (this.method == "put") {
-                RED.httpNode.put(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,rawBodyParser,this.callback,this.errorHandler);
-            } else if (this.method == "patch") {
-                RED.httpNode.patch(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,rawBodyParser,this.callback,this.errorHandler);
-            } else if (this.method == "delete") {
-                RED.httpNode.delete(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,rawBodyParser,this.callback,this.errorHandler);
+            if (this.method == "put") {
+                // RED.httpNode.post(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,multipartParser,rawBodyParser,this.callback,this.errorHandler);
+                RED.httpNode.put(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
             }
 
             this.on("close",function() {
@@ -292,6 +327,6 @@ module.exports = function(RED) {
         }
     }
 
-    RED.nodes.registerType("monster test",MonsterTest);
+    RED.nodes.registerType("monster upload",MonsterUpload);
 
 }

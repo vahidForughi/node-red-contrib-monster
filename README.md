@@ -1,12 +1,14 @@
-node-red-contrib-aws
+node-red-contrib-monster
 ========================
 A collection of <a href="http://nodered.org" target="_new">Node-RED</a> nodes for <a href="https://zdrive.ir" target="_new">Monster</a>.
 
 Nodes (All Monster API functions are available)
 -----------------
 
-* S3
-* Monster config
+* Monster S3
+* Monster Swift
+* Monster Upload
+* Monster Config
 
 Feature requests are welcome, submit an issue at https://opengit.ir/nodered/node-red-contrib-monster.git
 
@@ -38,6 +40,7 @@ Acknowledgements
 The node-red-contrib-monster uses the following open source software:
 
 - [AWS SDK for JavaScript] (https://github.com/aws/aws-sdk-js): AWS SDK for JavaScript in the browser and Node.js.
+- [Openstack Swift Client SDK for JavaScript] (https://www.npmjs.com/package/openstack-swift-client): Swift SDK for JavaScript in the browser and Node.js.
 
 License
 -------

@@ -7,12 +7,14 @@
             region: { value: "us-east-1", required: true },
             proxyRequired: { value: false },
             proxy: { value: "" },
-            projectId: { value: "" }
-        },
-        credentials: {
+            projectId: { value: "" },
             accessKey: {type:"text"},
             secretKey: {type:"password"}
         },
+        // credentials: {
+        //     accessKey: {type:"text"},
+        //     secretKey: {type:"password"}
+        // },
         label: function() {
             return this.name;
         }

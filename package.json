@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-monster",
-  "version": "0.0.26",
+  "version": "0.0.95",
   "description": "A collection of Node-RED nodes for Monster.  Includes nodes for S3 client.",
   "dependencies": {
     "aws-sdk": "^2",
@@ -33,6 +33,7 @@
     "nodes": {
       "Monster S3": "S3.js",
       "Monster Swift": "Swift.js",
+      "Swift Proxy": "SwiftProxy.js",
       "Monster Upload": "MonsterUpload.js",
       "monster config": "config.js"
     }

@@ -7,11 +7,15 @@ module.exports = function(RED) {
         this.projectId = n.projectId;
         this.proxyRequired = n.proxyRequired;
         this.proxy = n.proxy;
-        this.accessKey = this.credentials.accessKey;
-        this.secretKey = this.credentials.secretKey;
+        // this.accessKey = this.credentials.accessKey;
+        // this.secretKey = this.credentials.secretKey;
+        this.accessKey = n.accessKey;
+        this.secretKey = n.secretKey;
     }
-    RED.nodes.registerType("monster config",RemoteServerNode,{credentials: {
-         accessKey: {type:"text"},
-         secretKey: {type:"password"}
-     }});
+    RED.nodes.registerType("monster config",RemoteServerNode
+            // ,{credentials: {
+            //     accessKey: {type:"text"},
+            //     secretKey: {type:"password"}
+            // }}
+     );
 }

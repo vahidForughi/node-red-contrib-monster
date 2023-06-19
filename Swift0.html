@@ -27,16 +27,16 @@
 	<div class="form-row">
 		<label for="node-input-operation"><i class="fa fa-wrench"></i> Operation</label>
 		<select type="text" id="node-input-operation">
-          <!-- <optgroup label="Server">
+          <optgroup label="Server">
            <option value="ServerInfo">ServerInfo</option>
-          </optgroup> -->
+          </optgroup>
           <optgroup label="Containers">
            <option value="ListContainers">ListContainers</option>
            <option value="CreateContainer">CreateContainer</option>
            <option value="DeleteContainer">DeleteContainer</option>
            <option value="GetContainerMeta">GetContainerMeta</option>
            <option value="UpdateContainerMeta">UpdateContainerMeta</option>
-           <!-- <option value="HeadContainer">HeadContainer</option> -->
+           <option value="HeadContainer">HeadContainer</option>
           </optgroup>
           <optgroup label="Objects">
            <option value="ListObjects">ListObjects</option>
@@ -45,7 +45,7 @@
            <option value="DeleteObject">DeleteObject</option>
            <option value="GetObjectMeta">GetObjectMeta</option>
            <option value="UpdateObjectMeta">UpdateObjectMeta</option>
-           <!-- <option value="HeadObject">HeadObject</option> -->
+           <option value="HeadObject">HeadObject</option>
           </optgroup>
       
 		</select>
@@ -60,18 +60,14 @@
          <label for="node-input-Container"><i class="fa fa-tag"></i>Container</label>
          <input type="text" id="node-input-Container" placeholder="Container"></input>
      </div>
-     <div class="form-row" id='ObjectAttr' class='hiddenAttrs'>
-         <label for="node-input-Object"><i class="fa fa-tag"></i>Object</label>
-         <input type="text" id="node-input-Object" placeholder="Object"></input>
+     <div class="form-row" id='KeyAttr' class='hiddenAttrs'>
+         <label for="node-input-Key"><i class="fa fa-tag"></i>Key</label>
+         <input type="text" id="node-input-Key" placeholder="Key"></input>
      </div>
-     <div class="form-row" id='SourceAttr' class='hiddenAttrs'>
-         <label for="node-input-Source"><i class="fa fa-compass"></i>Source</label>
-         <input type="text" id="node-input-Source" placeholder="Source"></input>
+     <div class="form-row" id='FilenameAttr' class='hiddenAttrs'>
+         <label for="node-input-Filename"><i class="fa fa-compass"></i>Filename</label>
+         <input type="text" id="node-input-Filename" placeholder="Filename"></input>
      </div>
-     <div class="form-row" id='DestinationAttr' class='hiddenAttrs'>
-        <label for="node-input-Destination"><i class="fa fa-compass"></i>Destination</label>
-        <input type="text" id="node-input-Destination" placeholder="Destination"></input>
-    </div>
 	</div>
 
  <script>
@@ -84,13 +80,12 @@
         DeleteContainer: ['#ContainerAttr'],
         HeadContainer: ['#ContainerAttr'],
         ListObjects: ['#ContainerAttr'],
-        GetObject: ['#ContainerAttr','#ObjectAttr'],
-        GetObjectMeta: ['#ContainerAttr','#ObjectAttr'],
-        PutObject: ['#ContainerAttr','#ObjectAttr'],
-        CopyObject: ['#SourceAttr','#DestinationAttr'],
-        UpdateObjectMeta: ['#ContainerAttr','#ObjectAttr'],
-        DeleteObject: ['#ContainerAttr','#ObjectAttr'],
-        HeadObject: ['#ContainerAttr','#ObjectAttr']
+        GetObject: ['#ContainerAttr','#KeyAttr','#FilenameAttr'],
+        GetObjectMeta: ['#ContainerAttr','#KeyAttr'],
+        PutObject: ['#ContainerAttr','#KeyAttr','#FilenameAttr'],
+        UpdateObjectMeta: ['#ContainerAttr','#KeyAttr'],
+        DeleteObject: ['#ContainerAttr','#KeyAttr'],
+        HeadObject: ['#ContainerAttr','#KeyAttr']
       };
       $('#node-input-operation').on('change',function(){
           $('#AttrHolder').children().addClass('hiddenAttrs').removeClass('visibleAttrs');
@@ -122,10 +117,10 @@ NOTE: Parameters must be specified in the message, using the case specified in t
 			monster: {type:"monster config",required:true},
 			operation: { value: 'ListContainers' },
 				Container: { value: ""} ,
-				Object: { value: ""} ,
-                Source: { value: ""} ,
-				Destination: { value: ""} ,
-			    name: { value: "" }
+				Key: { value: ""} ,
+                Filename: { value: ""} ,
+				CopySource: { value: ""} ,
+			name: { value: "" }
 		},
 		inputs:1,
         outputs: 2,

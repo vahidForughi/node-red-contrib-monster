@@ -17,7 +17,7 @@
 module.exports = function(RED) {
 
 
-    function MonsterUpload(n) {
+    function SwiftProxy(n) {
         var request = require("request");
         var bodyParser = require("body-parser");
         var multer = require("multer");
@@ -112,7 +112,7 @@ module.exports = function(RED) {
             toWrap.forEach(function(f) {
                 if (typeof req[f] === "function") {
                     wrapper[f] = function() {
-                        node.warn("monster-pipe-upload.errors.deprecated-call",{method:"msg.req."+f});
+                        node.warn("monster-swift-proxy.errors.deprecated-call",{method:"msg.req."+f});
                         var result = req[f].apply(req,arguments);
                         if (result === req) {
                             return wrapper;
@@ -158,7 +158,7 @@ module.exports = function(RED) {
             ];
             toWrap.forEach(function(f) {
                 wrapper[f] = function() {
-                    node.warn("monster-pipe-upload.errors.deprecated-call",{method:"msg.res."+f});
+                    node.warn("monster-swift-proxy.errors.deprecated-call",{method:"msg.res."+f});
                     var result = res[f].apply(res,arguments);
                     if (result === res) {
                         return wrapper;
@@ -182,24 +182,26 @@ module.exports = function(RED) {
         if (RED.settings.httpNodeRoot !== false) {
 
 
-            // if (!n.urlPrefix) {
-            //     this.warn("monster-pipe-upload.errors.missing-path");
-            //     return;
+            if (!n.url) {
+                this.warn("monster-swift-proxy.errors.missing-path");
+                return;
+            }
+
+            this.baseUrl = n.baseUrl;
+            // this.warn("000");
+            // if (this.url.substr(0,1) != "/") {
+            //     this.warn("111");
+            //     this.warn(this.url);
+            //     this.url = "/"+this.url;
+            //     this.warn(this.url);
             // }
-            
-            if (!n.urlPrefix) {
-                this.url = ""
-            }
-            else {
-                this.url = n.urlPrefix
-                if (this.url[0] !== '/') {
-                    this.url = '/'+this.url;
-                }
-            }
-            this.url += "/:container/:object"
-            this.method = "put";
-            this.upload = true;
-            this.monsterConfig = RED.nodes.getNode(n.monster);
+            // this.warn("222");
+            // this.warn(this.url);
+            // this.upload = true;
+            this.monsterEndpoint = n.monsterEndpoint;
+            // if(this.monsterEndpoint.substr(this.monsterEndpoint.length - 1) == "/") {
+                // this.monsterEndpoint.slice(0, -1);
+            // }
             var node = this;
 
             this.errorHandler = function(err,req,res,next) {
@@ -208,68 +210,46 @@ module.exports = function(RED) {
             };
 
 
-            const config = {
-                endpoint: node.monsterConfig.endpoint,
-                projectId: node.monsterConfig.projectId,
-                accessKey: node.monsterConfig.accessKey,
-                secretKey: node.monsterConfig.secretKey,
-            }
-            const publicURL= config.endpoint+"/v1/AUTH_test"
-            let token = null;
-            let serverError = null;
-
-            function getToken(cfg) {
-                // node.status({fill:"yellow",shape:"dot",text:"authenticating"});
-                request({
-                    url: cfg.endpoint+'/auth/v1.0/',
-                    method: 'GET',
-                    headers: {
-                        "X-Storage-User": cfg.projectId + ':' + cfg.accessKey,
-                        "X-Storage-Pass": cfg.secretKey
-                    }
-                }, (error, response, body) => {
-                    // node.send([null, {point: "getToken",error: error, response: response, body: body}]);
-                    if (response && response.statusCode === 200) {
-                        token = response.headers["x-auth-token"]
-                        // node.status({fill:"green",shape:"dot",text:"authenticate"});
-                    }
-                    else{
-                        serverError = error
-                        // node.status({fill:"red",shape:"dot",text:"unAuthenticate"});
-                        // setTimeout(()=>{ getToken() },5000)
-                    }
-                });
-            }
-            getToken(config)
-
-            this.callback = async function(req,res) {
+            this.callback = function(req,res) {
+                // node.warn("000000000");
                 var msgid = RED.util.generateId();
-                if (!token) { await getToken(config) }
 
-                if (!token) {
-                    node.send([null, {_msgid:msgid,req:req,res: createResponseWrapper(node, res),payload:{statusCode: 401, error: serverError}}]);
-                }
-                else {
-                    const container = req.params.container
-                    const object = req.params.object
+                // node.warn("111111111");
+                // let url = req.url.substr(node.url.length, req.url.length);
+                // if (url.substr(0,1) != "/") { url = "/"+ url; }
+                // url = node.monsterEndpoint + url;
+                // node.warn("222222222");
+                // node.send({url: url, reqUrl: req.url, reqUrlWithout: req.url.substr(node.url.length, req.url.length)});
+                // node.warn("333333333");
+                // const method = req.method;
+                // node.method = method
+                // const body = req.body
+                // parse rawHeaders
+                // const rawHeaders = req.rawHeaders
+                // var headers = {};
+                // rawHeaders.forEach(h => {
+                //     for(var i=0; i<rawHeaders.length; i+=2) {
+                //         headers[rawHeaders[i]] = rawHeaders[i+1]
+                //     }
+                // });
 
-                    var pipe = req.pipe(request({
-                        url: config.endpoint + "/v1/AUTH_test" + "/" + container + "/" + object,
-                        method: 'PUT',
-                        headers: {
-                            "Content-Type": "text/html; charset=UTF-8",
-                            "X-Auth-Token": token
-                        }
-                    }));
-                    pipe.on('end', () => {
-                        res._msgid = msgid;
-                        if (pipe.response && (pipe.response.statusCode === 200 || pipe.response.statusCode === 201 || pipe.response.statusCode === 203 || pipe.response.statusCode === 204)) {
-                            node.send([{_msgid: msgid,req: req,res: createResponseWrapper(node, res),payload: {...pipe.response, container: container, object: object}}, null]);
-                        }else {
-                            node.send([null, {_msgid:msgid,req:req,payload:pipe.response}]);
-                        }
-                    })
-                }
+                // node.warn("444444444444");
+                // var str = "";
+                // var pipe = req.pipe(request({
+                //     url: url,
+                //     method: method,
+                //     headers: headers
+                // }));
+                // pipe.on('data', (data) => {
+                //     str += data
+                // })
+                // pipe.on('end', () => {
+                //   node.warn("5555555555555");
+                //     res._msgid = msgid;
+                //     node.send({_msgid: msgid,req: req,res: createResponseWrapper(node, res),payload: str, ...pipe.response});
+                // })
+                // node.warn("6666666666666");
+                node.send({_msgid: msgid,req: req,res: createResponseWrapper(node, res),payload: "salam"});
             };
 
             var httpMiddleware = function(req,res,next) { next(); }
@@ -314,10 +294,20 @@ module.exports = function(RED) {
                 };
             }
 
-            if (this.method == "put") {
-                // RED.httpNode.post(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,multipartParser,rawBodyParser,this.callback,this.errorHandler);
-                RED.httpNode.put(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
-            }
+            // const baseUrl = node.url != "/" ? node.url : ""
+            // node.warn("555");
+            // node.warn(baseUrl);
+            RED.httpNode.get("/proxy2"+"/auth/v1.0/",cookieParser(),httpMiddleware,corsHandler,metricsHandler,this.callback,this.errorHandler);
+            RED.httpNode.get("/proxy2"+"/info",cookieParser(),httpMiddleware,corsHandler,metricsHandler,this.callback,this.errorHandler);
+            RED.httpNode.get("/proxy2"+"/v1/:account",cookieParser(),httpMiddleware,corsHandler,metricsHandler,this.callback,this.errorHandler);
+            RED.httpNode.get("/proxy2"+"/v1/:account/:container",cookieParser(),httpMiddleware,corsHandler,metricsHandler,this.callback,this.errorHandler);
+            RED.httpNode.get("/proxy2"+"/v1/:account/:container/:object",cookieParser(),httpMiddleware,corsHandler,metricsHandler,this.callback,this.errorHandler);
+            RED.httpNode.post("/proxy2"+"/v1/:account/:container",cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
+            RED.httpNode.post("/proxy2"+"/v1/:account/:container/:object",cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
+            RED.httpNode.put("/proxy2"+"/v1/:account/:container",cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
+            RED.httpNode.put("/proxy2"+"/v1/:account/:container/:object",cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
+            RED.httpNode.delete("/proxy2"+"/v1/:account/:container",cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
+            RED.httpNode.delete("/proxy2"+"/v1/:account/:container/:object",cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
 
             this.on("close",function() {
                 var node = this;
@@ -328,10 +318,10 @@ module.exports = function(RED) {
                 });
             });
         } else {
-            this.warn("monster-pipe-upload.errors.not-created");
+            this.warn("monster-swift-proxy.errors.not-created");
         }
     }
 
-    RED.nodes.registerType("monster upload",MonsterUpload);
+    RED.nodes.registerType("swift proxy",SwiftProxy);
 
 }

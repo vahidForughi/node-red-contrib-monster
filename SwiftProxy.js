@@ -182,8 +182,8 @@ module.exports = function(RED) {
         if (RED.settings.httpNodeRoot !== false) {
 
             const routes = {
-                Auth: {method: "GET" ,path: "/auth/v1.0/"},
-                Info: {method: "GET" ,path: "/info"},
+                auth: {method: "GET" ,path: "/auth/v1.0/"},
+                info: {method: "GET" ,path: "/info"},
                 ContainerList: {method: "GET" ,path: "/v1/:account"},
                 ContainerCreate: {method: "PUT" ,path: "/v1/:account/:container"},
                 ContainerMetaUpdate: {method: "POST" ,path: "/v1/:account/:container"},
@@ -191,6 +191,7 @@ module.exports = function(RED) {
                 ObjectList: {method: "GET" ,path: "/v1/:account/:container"},
                 ObjectGet: {method: "GET" ,path: "/v1/:account/:container/:object"},
                 ObjectCreate: {method: "PUT" ,path: "/v1/:account/:container/:object"},
+                ObjectCopy: {method: "COPY" ,path: "/v1/:account/:container/:object"},
                 ObjectMetaUpdate: {method: "POST" ,path: "/v1/:account/:container/:object"},
                 ObjectDelete: {method: "DELETE" ,path: "/v1/:account/:container/:object"}
             }
@@ -232,10 +233,10 @@ module.exports = function(RED) {
                 let url = req.url.substr(node.urlPrefix.length, req.url.length);
                 if (url.substr(0,1) != "/") { url = "/"+ url; }
                 url = node.monsterEndpoint + url;
-                node.send({url: url, reqUrl: req.url, reqUrlWithout: req.url.substr(node.urlPrefix.length, req.url.length)});
+                // node.warn({url: url, reqUrl: req.url, reqUrlWithout: req.url.substr(node.urlPrefix.length, req.url.length)});
                 const method = req.method;
                 node.method = method
-                const body = req.body
+                // const body = req.body
                 //parse rawHeaders
                 const rawHeaders = req.rawHeaders
                 var headers = {};
@@ -245,20 +246,29 @@ module.exports = function(RED) {
                     }
                 });
                 
+                Object.filter = (obj, predicate) => Object.fromEntries(Object.entries(obj).filter(predicate));
+                const type = Object.keys((Object.filter(routes, ([key, route]) => route.path == req.route.path && route.method == req.method)))[0];
+                res._msgid = msgid;
+
                 var str = "";
                 var pipe = req.pipe(request({
                     url: url,
                     method: method,
                     headers: headers
                 }));
+                pipe.on('error', (err) => {
+                    const message = {_msgid: msgid, type: type, payload: err, statusCode: 500, req: req,res: createResponseWrapper(node, res)} 
+                    node.send([null, message]);
+                })
                 pipe.on('data', (data) => {
                     str += data
                 })
                 pipe.on('end', () => {
-                    res._msgid = msgid;
-                    Object.filter = (obj, predicate) => Object.fromEntries(Object.entries(obj).filter(predicate));
-                    const type = Object.keys((Object.filter(routes, ([key, route]) => route.path == req.route.path && route.method == req.method)))[0];
-                    node.send({_msgid: msgid, type: type, payload: str, statusCode: pipe.response.statusCode, headers: pipe.response.headers, req: req,res: createResponseWrapper(node, res)});
+                    const message = {_msgid: msgid, type: type, payload: str, statusCode: pipe.response.statusCode, headers: pipe.response.headers, req: req,res: createResponseWrapper(node, res)} 
+                    if ([200,201,202,203,204].includes(pipe.response.statusCode))
+                        node.send([message, null]);
+                    else
+                        node.send([null, message]);
                 })
             };
 
@@ -314,6 +324,7 @@ module.exports = function(RED) {
             RED.httpNode.post(this.urlPrefix+"/v1/:account/:container/:object",cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
             RED.httpNode.put(this.urlPrefix+"/v1/:account/:container",cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
             RED.httpNode.put(this.urlPrefix+"/v1/:account/:container/:object",cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
+            RED.httpNode.copy(this.urlPrefix+"/v1/:account/:container/:object",cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
             RED.httpNode.delete(this.urlPrefix+"/v1/:account/:container",cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
             RED.httpNode.delete(this.urlPrefix+"/v1/:account/:container/:object",cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.callback,this.errorHandler);
 

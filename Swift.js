@@ -60,10 +60,28 @@ module.exports = function(RED) {
 		node.monsterConfig = this.monsterConfig
 		
 		node.on("input", async function(msg) {
+			const initSwift = async function (config) {
+				var ser = new Swift(config.endpoint)
+				await ser.init(...genCredential(config))
+				return ser;
+			}
+			let monsterConfig = {...node.monsterConfig}
+			let initAgain = false			
+			
+			const globalMonsterConfig = this.context().global.get('MonsterConfig')
+			if (globalMonsterConfig) {
+				monsterConfig = { ...monsterConfig, ...globalMonsterConfig }
+				initAgain = true;
+			}
+
 			if (msg.MonsterConfig) {
-				var aService = new Swift(node.monsterConfig.endpoint)
-				await aService.init(...genCredential(node.monsterConfig))
-			}else {
+				monsterConfig = { ...monsterConfig, ...msg.MonsterConfig }
+				initAgain = true;
+			}
+
+			if (initAgain) {
+				aService = await initSwift(monsterConfig)
+			} else {
 				var aService = swift;
 			}
 			// node.send([{n:n ,msg: msg, config: node.monsterConfig, swift: swift, aService: aService},null]);
@@ -84,11 +102,19 @@ module.exports = function(RED) {
 
 			if (typeof service[node.operation] == "function"){
 				node.status({fill:"blue",shape:"dot",text:node.operation});
-				const req = await service[node.operation](aService,msg,function(err,data){
-					// node.sendMsg(err, data, msg);
+				let req = await service[node.operation](aService,msg,function(err,data){
+					// node.sendMsg(req)
 				});
-        		// node.sendMsg(req)
-				node.send([{...msg, payload: req},null]);
+				
+				if (req.status && [200,201,202,203,204].includes(req.status)) {
+					node.send([{...msg, payload: req},null]);
+				} else if (req.message && (req.message).search("401") >= 0) {
+					aService = await initSwift(monsterConfig)
+					req = await service[node.operation](aService,msg,function(err,data){});
+					node.send([{...msg, payload: req},null]);
+				} else {
+					node.send([null, {...msg, payload: req}]);
+				}
 
 			} else {
 				node.error("failed: Operation node defined - "+node.operation);
@@ -199,7 +225,23 @@ module.exports = function(RED) {
 			copyArg(msg,"Container",params,undefined,false);
 			copyArg(msg,"Object",params,undefined,false);
 			// copyArg(msg,"Filename",params,undefined,false);
-			return await svc.getObjectContent(params["Container"],params["Object"]);
+			const res = await svc.getObjectContent(params["Container"],params["Object"]);
+			if (typeof res.message === 'object' && typeof res.message.on === 'function') {
+				return new Promise((resolve, reject) => {
+					const stream = res.message;
+					res.message = '';
+					var result = []
+					stream.on('data', data => {
+						result.push(Buffer.from(data))
+					});
+					stream.on('end', () => {
+						resolve({...res, message: Buffer.concat(result)})
+					});
+				});
+			}
+			else {
+				return res
+			}
 		}
 
 		service.PutObject=async function(svc,msg,cb){

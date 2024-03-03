@@ -261,6 +261,9 @@ module.exports = function(RED) {
                             "X-Auth-Token": token
                         }
                     }));
+                    pipe.on('error', (err) => {
+                        node.send([null, {_msgid:msgid,payload:err, statusCode: 500, req:req, res: createResponseWrapper(node, res)}]);
+                    })
                     pipe.on('end', () => {
                         res._msgid = msgid;
                         if (pipe.response && (pipe.response.statusCode === 200 || pipe.response.statusCode === 201 || pipe.response.statusCode === 203 || pipe.response.statusCode === 204)) {
